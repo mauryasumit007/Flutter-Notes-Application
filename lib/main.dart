@@ -60,7 +60,7 @@ class App extends StatelessWidget {
       //   '/about': (context) => About(),
       //   '/settings': (context) => Settings(),
       // }
-
+      debugShowCheckedModeBanner:false,
       theme: ThemeData(
         primarySwatch: Colors.red,
         brightness: Brightness.light,
@@ -86,6 +86,7 @@ class App extends StatelessWidget {
           }
         },
       ),
+
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:bloc_login/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bloc_login/login/bloc/login_bloc.dart';
@@ -77,7 +78,7 @@ class _LoginFormState extends State<LoginForm> {
                     ),
                     Container(
                       child: state is LoginLoading
-                          ? CircularProgressIndicator()
+                          ?   showLoaderDialog(context)
                           : null,
                     ),
                   ],

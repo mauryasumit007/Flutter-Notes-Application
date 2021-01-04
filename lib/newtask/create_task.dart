@@ -13,18 +13,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class CreateTask extends StatefulWidget {
 // Declare this variable
+  String screenName, taskDesc,_id;
+  bool taskStatus= false;
 
-  CreateTask();
+
+
+  CreateTask(this.screenName, this.taskDesc, this.taskStatus,this._id);
 
   @override
-  _CreateTaskState createState() => _CreateTaskState();
+  _CreateTaskState createState() => _CreateTaskState(this.screenName, this.taskDesc, this.taskStatus,this._id);
 
 }
 
 class _CreateTaskState extends State<CreateTask> {
   UserRepository userRepository;
-  final textController_description=TextEditingController();
-
+  String screenName, taskDesc,_id;
+  bool taskStatus= false;
+  //TextEditingController textController_description=TextEditingController();
+  _CreateTaskState(this.screenName, this.taskDesc, this.taskStatus,this._id);
 // Declare this variable
   int selectedRadioTile;
   final focusNode= FocusNode();
@@ -32,6 +38,7 @@ class _CreateTaskState extends State<CreateTask> {
 
   final scaffoldKey= GlobalKey<ScaffoldState>();
   final formKey=GlobalKey<FormState>();
+  TextEditingController textController_description = TextEditingController();
 
 
   String _description;
@@ -43,6 +50,8 @@ class _CreateTaskState extends State<CreateTask> {
     super.initState();
     // textController.addListener(printvalues);
     selectedRadioTile = 0;
+    textController_description.text=taskDesc;
+
   }
 
   setSelectedRadioTile(int val) {
@@ -54,17 +63,20 @@ class _CreateTaskState extends State<CreateTask> {
   @override
   Widget build(BuildContext context) {
     final _screenSize = MediaQuery.of(context).size;
+    String appTitle= "Create New Task";
 
 
 
 
     return Scaffold(
       key: scaffoldKey,
-      appBar:AppBar(title: Text("Create New Task"),) ,
+      resizeToAvoidBottomPadding: false,
+      appBar:  AppBar(title: Text(gettitle(screenName)),) ,
       body: Padding(padding: EdgeInsets.all(20.0),
         child: Form(key:formKey,
           child: Column(
             children: <Widget>[
+
               TextFormField(decoration: InputDecoration(labelText: "Enter Task description"),
                   validator: (val)=> val.isEmpty?'Please Enter Task Description!!!':null,
                   onSaved: (val)=>_description=val,
@@ -82,6 +94,7 @@ class _CreateTaskState extends State<CreateTask> {
 
               RadioListTile(
                 value: 1,
+                selected: taskStatus,
                 groupValue: selectedRadioTile,
                 title: Text("Yes"),
                 subtitle: Text("Task completed"),
@@ -89,12 +102,13 @@ class _CreateTaskState extends State<CreateTask> {
                   print("Radio Tile pressed $val");
                   setSelectedRadioTile(val);
                 },
-                activeColor: Colors.red,
+                activeColor: Colors.blue,
 
 
               ),
               RadioListTile(
                 value: 2,
+                selected: true,
                 groupValue: selectedRadioTile,
                 title: Text("No"),
                 subtitle: Text("Task not completed"),
@@ -102,7 +116,7 @@ class _CreateTaskState extends State<CreateTask> {
                   print("Radio Tile pressed $val");
                   setSelectedRadioTile(val);
                 },
-                activeColor: Colors.red,
+                activeColor: Colors.green,
 
 
               ),
@@ -128,12 +142,29 @@ class _CreateTaskState extends State<CreateTask> {
 
 
                     },
-                    child: Text(
-                      'Create Task',
-                      style: TextStyle(
-                          fontSize: 24.0,color: Colors.white
-                      ),
-                    ),
+                    child:
+                    Builder(
+                        builder: (context) {
+                          if (screenName=="updateTask") {
+                            return Text(
+                              'Update Task',
+                              style: TextStyle(
+                                  fontSize: 24.0,color: Colors.white
+                              ),
+                            );
+                          } else {
+                            return Text(
+                              'Create Task',
+                              style: TextStyle(
+                                  fontSize: 24.0,color: Colors.white
+                              ),
+                            );
+                          }
+                        }
+                    )
+
+
+                    ,
                     shape: StadiumBorder(
 
                       side: BorderSide(
@@ -182,22 +213,44 @@ class _CreateTaskState extends State<CreateTask> {
     final form = formKey.currentState;
     if(form.validate()){
       form.save();
-      final http.Response response = await http.post(
-        "https://sumit-task-manager-nodejs.herokuapp.com/tasks/",
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer '+ token
-        },
-        body: jsonEncode(cmodel.toDatabaseJson()),
-      );
+       http.Response response;
+      if(screenName=="updateTask"){
+         response = await http.patch(
+          "https://sumit-task-manager-nodejs.herokuapp.com/tasks/"+_id,
+
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer '+ token
+          },
+          body: jsonEncode(cmodel.toDatabaseJson()),
+        );
+      }else{
+
+         response = await http.post(
+          "https://sumit-task-manager-nodejs.herokuapp.com/tasks/",
+
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer '+ token
+          },
+          body: jsonEncode(cmodel.toDatabaseJson()),
+        );
+      }
+
+
       if (response.statusCode == HttpStatus.CREATED) {
         Navigator.pop(context);
 
-        final snakbar=SnackBar(content: Text("Task Created Successfully!"),);
-        scaffoldKey.currentState.showSnackBar(snakbar);
-        // Navigator.of(context).popUntil((route) => route.isFirst);
-        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => LoginPage(userRepository: userRepository,)));
 
+          final snakbar=SnackBar(content: Text("Task Created Successfully!"),);
+          scaffoldKey.currentState.showSnackBar(snakbar);
+
+
+
+      }else if(response.statusCode == HttpStatus.OK){
+        Navigator.pop(context);
+        final snakbar=SnackBar(content: Text("Task Updated Successfully!"),);
+        scaffoldKey.currentState.showSnackBar(snakbar);
       }else{
 
         Navigator.pop(context);
@@ -237,6 +290,18 @@ class _CreateTaskState extends State<CreateTask> {
     return stringValue;
 
   }
+
+  String gettitle(String taskDesc) {
+
+    if(taskDesc=="updateTask"){
+     return "Update Task";
+    }else {
+      return "Create New Task";
+    }
+
+  }
+
+
 }
 
 

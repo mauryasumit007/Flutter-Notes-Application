@@ -1,7 +1,10 @@
+import 'package:bloc_login/bloc/authentication_bloc.dart';
+import 'package:bloc_login/home_pages/about.dart';
 /**
  * Created by sumit maurya
  */
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 const kTitle = 'Flutter Notes App';
 
@@ -30,12 +33,18 @@ class DrawerMenu extends StatelessWidget {
             Navigator.pushReplacementNamed(context, '/');
           }),
           getLine(),
-          getListTile('About', onTap: () {
-            Navigator.pushReplacementNamed(context, '/about');
+          getListTile('My Profile', onTap: () {
+            Navigator.push(
+              context,
+              new MaterialPageRoute(
+                builder: (context) => new About(),
+              ),
+            );
           }),
           getLine(),
-          getListTile('Settings', onTap: () {
-            Navigator.pushReplacementNamed(context, '/settings');
+          getListTile('Logout', onTap: () {
+            BlocProvider.of<AuthenticationBloc>(context)
+                .add(LoggedOut());
           }),
         ],
       ),

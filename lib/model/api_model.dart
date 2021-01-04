@@ -53,5 +53,19 @@ class CreateTaskModel {
 }
 
 
+class UpdateProfileModel {
+  String age,emailid;
+
+
+  UpdateProfileModel({this.age,this.emailid});
+
+
+  Map <String, dynamic> toDatabaseJson() => {
+    "age": this.age,
+    "email": this.emailid
+  };
+}
+
+
 
 

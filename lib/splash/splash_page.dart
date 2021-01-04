@@ -5,7 +5,10 @@ class SplashPage extends StatelessWidget {
   Widget build (BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text('Splash Screen'),
+        child: Text('Welcome to'
+            ' Flutter Notes App!',style: TextStyle(
+            color: Colors.lightBlueAccent,
+            fontSize: 22.0)),
       ),
     );
   }

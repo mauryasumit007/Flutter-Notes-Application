@@ -91,6 +91,7 @@ class _SignUpState extends State<SignUp> {
 
     return Scaffold(
       key: scaffoldKey,
+      resizeToAvoidBottomPadding: false,
       appBar:AppBar(title: Text("SIGNUP FORM"),) ,
       body: Padding(padding: EdgeInsets.all(20.0),
         child: Form(key:formKey,
@@ -169,7 +170,7 @@ class _SignUpState extends State<SignUp> {
 
   Future<Token> _submit() async {
 
-    showLoaderDialog(context);
+
     
     UserSignup userLogin = UserSignup(
         name:  textController_name.text,
@@ -180,6 +181,7 @@ class _SignUpState extends State<SignUp> {
     final form = formKey.currentState;
     if(form.validate()){
       form.save();
+      showLoaderDialog(context);
       final http.Response response = await http.post(
         "https://sumit-task-manager-nodejs.herokuapp.com/users",
         headers: <String, String>{
