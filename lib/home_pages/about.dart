@@ -438,7 +438,7 @@ var imgtoLoad = new NetworkImage(
   }
 
   Future<String> _uploadAvatar(String string, String token, BuildContext context, File imageFile) async {
-
+    token = await getaccessToken();
     String res="";
     showLoaderDialog(context);
     Map<String, String> header = { 'Authorization': 'Bearer '+ token};
